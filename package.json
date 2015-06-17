@@ -20,12 +20,16 @@
     "PEG",
     "plugin"
   ],
+  "repository":      {
+    "type": "git",
+    "url":  "https://github.com/bpow/pegjs-bonsai.git"
+  },
   "peerDependencies": {
     "pegjs": "~0.8.0"
   },
   "devDependencies": {
-    "jasmine-node": "= 1.11.0",
-    "jshint":       "= 2.3.0"
+    "jasmine-node": "= 1.14.5",
+    "jshint":       "= 2.8.0"
   },
   "license": "BSD-3-Clause",
   "engines": {
