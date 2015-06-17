@@ -1,0 +1,34 @@
+{
+  "name": "pegjs-bonsai",
+  "version": "0.1.0",
+  "description": "Produce a well-pruned tree from a pegjs grammar",
+  "author": {
+    "name": "Bradford Powell",
+    "email": "bpow@drpowell.org"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node_modules/jasmine-node/bin/jasmine-node spec/*.js --verbose"
+  },
+  "files": [
+      "README.md",
+      "LICENSE",
+      "src/index.js"
+  ],
+  "keywords": [
+    "pegjs",
+    "PEG",
+    "plugin"
+  ],
+  "peerDependencies": {
+    "pegjs": "~0.8.0"
+  },
+  "devDependencies": {
+    "jasmine-node": "= 1.11.0",
+    "jshint":       "= 2.3.0"
+  },
+  "license": "BSD-3-Clause",
+  "engines": {
+    "node": ">= 0.10.0"
+  }
+}
