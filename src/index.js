@@ -17,11 +17,11 @@ exports.pass = function(ast, options) {
     }
 
     function generate_code_without_undefined(labels) {
-        return ['var val = {};']
+        return ['\n  var val = {};']
             .concat(labels.map(function(label) {
-                return 'if (' + label + ' !== undefined && ' + label + ' !== null) val["' + label + '"] = ' + label + ';';
+                return '  if (' + label + ' !== undefined && ' + label + ' !== null) val["' + label + '"] = ' + label + ';';
             }))
-            .concat('return val;')
+            .concat('  return val;')
             .join('\n');
     }
 
