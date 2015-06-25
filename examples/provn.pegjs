@@ -4,16 +4,10 @@
 
 document =
     _ 'document'
-    _ namespaces:(namespaceDeclarations)? 
+    _ namespaces:(namespaceDeclarations)?
     _ expressions:expression*
     _ bundles:bundle*
     _ 'endDocument' _;
-
-bundle = 'bundle'
-    _ bundle:identifier
-    _ namespaces:namespaceDeclarations?
-    _ expressions:expression*
-    _ 'endBundle' _;
 
 // NOTE: because this is a PEG, there is some potential for optimization by
 //       placing the more common expressions first in the choice list
@@ -40,118 +34,148 @@ expression = _:(
 
 
 /*
-   Expressions
+   Component 1: Entites and Activities
 */
-
-activityExpression =
-    expressionType:'activity' '('
-    activity:identifier
-    ( CMMA timeOrMarker CMMA timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
-
-agentExpression =
-    expressionType:'agent' '('
-    agent:identifier
-    attributeValuePairs:optionalAttributeValuePairs? ')';
 
 entityExpression =
     expressionType:'entity' '('
-    entity:identifier
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    id:identifier
+    attributes:optionalattributes? ')';
+
+activityExpression =
+    expressionType:'activity' '('
+    id:identifier
+    optionals:( CMMA startTime:timeOrMarker CMMA endTime:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
 generationExpression =
     expressionType:'wasGeneratedBy' '('
-    optionalIdentifier:optionalIdentifier?
+    id:optionalIdentifier?
     entity:identifier
-    wasGeneratedBy:( CMMA activity:identifierOrMarker CMMA time:timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    optionals:( CMMA activity:identifierOrMarker CMMA time:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
 usageExpression =
     expressionType:'used' '('
-    optionalIdentifier:optionalIdentifier?
+    id:optionalIdentifier?
     activity:identifier
-    used:( CMMA entity:identifierOrMarker CMMA time:timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
-
-startExpression =
-    expressionType:'wasStartedBy' '('
-    optionalIdentifier:optionalIdentifier?
-    agent:identifier
-    wasStartedBy:( CMMA entity:identifierOrMarker CMMA agent:identifierOrMarker CMMA time:timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
-
-endExpression =
-    expressionType:'wasEndedBy' '('
-    optionalIdentifier:optionalIdentifier?
-    agent:identifier
-    wasEndedBy:( CMMA entity:identifierOrMarker CMMA agent:identifierOrMarker CMMA time:timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
-
-invalidationExpression =
-    expressionType:'wasInvalidatedBy' '('
-    optionalIdentifier:optionalIdentifier?
-    entity:identifier
-    wasInvalidatedBy:( CMMA agent:identifierOrMarker CMMA time:timeOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    optionals:( CMMA entity:identifierOrMarker CMMA time:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
 communicationExpression =
     expressionType:'wasInformedBy' '('
-    optionalIdentifier:optionalIdentifier?
-    agent:identifier CMMA
-    wasInformedBy:identifier
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    id:optionalIdentifier?
+    informed:identifier CMMA
+    informant:identifier
+    attributes:optionalAttributeValuePairs? ')';
 
-associationExpression =
-    expressionType:'wasAssociatedWith' '('
-    optionalIdentifier:optionalIdentifier?
-    agent:identifier
-    wasAssociatedWith:( CMMA agent:identifierOrMarker CMMA entity:identifierOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+startExpression =
+    expressionType:'wasStartedBy' '('
+    id:optionalIdentifier?
+    activity:identifier
+    optionals:( CMMA trigger:identifierOrMarker CMMA starter:identifierOrMarker CMMA time:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
-attributionExpression =
-    expressionType:'wasAttributedTo' '('
-    optionalIdentifier:optionalIdentifier?
-    entity:identifier CMMA
-    wasAttributedTo:identifier
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+endExpression =
+    expressionType:'wasEndedBy' '('
+    id:optionalIdentifier?
+    activity:identifier
+    optionals:( CMMA trigger:identifierOrMarker CMMA ender:identifierOrMarker CMMA time:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
-delegationExpression =
-    expressionType:'actedOnBehalfOf' '('
-    optionalIdentifier:optionalIdentifier?
-    agent:identifier CMMA
-    actedOnBehalfOf:identifier
-    activity:( CMMA _:identifierOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+invalidationExpression =
+    expressionType:'wasInvalidatedBy' '('
+    id:optionalIdentifier?
+    entity:identifier
+    optionals:( CMMA activity:identifierOrMarker CMMA time:timeOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
+
+/*
+   Component 2: Derivations
+*/
 
 derivationExpression =
     expressionType:'wasDerivedFrom' '('
-    optionalIdentifier:optionalIdentifier?
-    entity:identifier CMMA
-    wasDerivedFrom:identifier
+    id:optionalIdentifier?
+    generatedEntity:identifier CMMA
+    usedEntity:identifier
     ( CMMA activity:identifierOrMarker CMMA generation:identifierOrMarker CMMA usage:identifierOrMarker )?
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    attributes:optionalAttributeValuePairs? ')';
+
+/*
+   Component 3: Agents, Responsibility and Influence
+*/
+
+agentExpression =
+    expressionType:'agent' '('
+    id:identifier
+    attributes:optionalAttributeValuePairs? ')';
+
+attributionExpression =
+    expressionType:'wasAttributedTo' '('
+    id:optionalIdentifier?
+    entity:identifier CMMA
+    agent:identifier
+    attributes:optionalAttributeValuePairs? ')';
+
+associationExpression =
+    expressionType:'wasAssociatedWith' '('
+    id:optionalIdentifier?
+    activity:identifier
+    optionals:( CMMA agent:identifierOrMarker CMMA plan:identifierOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
+
+delegationExpression =
+    expressionType:'actedOnBehalfOf' '('
+    id:optionalIdentifier?
+    delegate:identifier CMMA
+    responsible:identifier
+    activity:( CMMA _:identifierOrMarker )?
+    attributes:optionalAttributeValuePairs? ')';
 
 influenceExpression =
     expressionType:'wasInfluencedBy' '('
-    optionalIdentifier:optionalIdentifier?
-    entity:identifier CMMA
-    wasDerivedFrom:identifier
-    attributeValuePairs:optionalAttributeValuePairs? ')';
+    id:optionalIdentifier?
+    influencee:identifier CMMA
+    influencer:identifier
+    attributes:optionalAttributeValuePairs? ')';
 
-alternateExpression =
-    expressionType:'alternateOf' '('
-    entity:identifier CMMA
-    alternateOf:identifier ')';
+/*
+   Component 4: Bundles
+*/
+
+bundle = 'bundle'
+    _ id:identifier
+    _ namespaces:namespaceDeclarations?
+    _ descriptions:expression*
+    _ 'endBundle' _;
+
+/*
+   Component 5: Alternate Entities
+*/
 
 specializationExpression =
     expressionType:'specializationOf' '('
-    entity:identifier CMMA
-    specializationOf:identifier ')';
+    specificEntity:identifier CMMA
+    generalEntity:identifier ')';
+
+alternateExpression =
+    expressionType:'alternateOf' '('
+    alternate1:identifier CMMA
+    alternate2:identifier ')';
+
+/*
+   Component 6: Collections
+*/
 
 membershipExpression =
     expressionType:'hadMember' '('
     collection:identifier CMMA
-    hadMember:identifier ')';
+    entity:identifier ')';
+
+/*
+   Extensibility
+*/
 
 extensibilityExpression = extName:QUALIFIED_NAME
     expressionType:'('
@@ -209,7 +233,7 @@ QUALIFIED_NAME = prefix:( _:PN_PREFIX ':' )? local:PN_LOCAL /  prefix:PN_PREFIX 
 
 
 /*
-   rules that are just about straight from the PROV-N specification (with some $() textualizations)
+   basic definitions (PEGs do not have lexing, but this section is pretty much lexical)
 */
 
 PN_NON_DOT = PN_CHARS / PN_CHARS_OTHERS;
@@ -255,7 +279,7 @@ STRING_LITERAL2 = DOUBLE_QUOTE ( ([^\u0022\u005C\u000A\u000D]) / ECHAR )* DOUBLE
 STRING_LITERAL_LONG2 = '"""' ( ( '"' / '""' )? ( [^"\\] / ECHAR ) )* '"""';
 ECHAR = '\\' [tbnrf\'\"];
 LANGTAG = '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*;
-IRI_REF = ('<' ([^<>"{}|^`\u0000-\u0020] / '[' / '\\' / ']')* '>') { return text(); };
+IRI_REF = $('<' ([^<>"{}|^`\u0000-\u0020] / '[' / '\\' / ']')* '>');
 
 
 /*
