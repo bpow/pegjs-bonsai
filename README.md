@@ -54,7 +54,7 @@ console.log(parser.parse('32F');
 Some configuration is available, passed to PEG.buildParser in the
 `options.bonsaiPlugin` object:
 
-* `showTranformation` (for debugging purposes) if `true`, writes the
+* `showTransformed` (for debugging purposes) if `true`, writes the
   transformed AST of the grammar to `console.log` after the
   transformation pass is complete
 
