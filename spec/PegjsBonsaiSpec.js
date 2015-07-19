@@ -75,4 +75,12 @@ describe("Bonsai", function () {
         });
     });
 
+    describe("behavior of exposeTextAs option", function () {
+        it("when set to a string, sets PEG's text() as the value of that property", function () {
+            var parser = PEG.buildParser("rule = first:'one' ' '? second:'two'?", {plugins:[bonsai], bonsaiPlugin:{ exposeTextAs:'$text' }});
+            expect(parser.parse('one two')).toEqual({first: 'one', second: 'two', $text: 'one two'});
+            expect(parser.parse('one')).toEqual({first: 'one', $text: 'one'});
+        });
+    });
+
 });
