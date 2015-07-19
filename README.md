@@ -6,7 +6,7 @@ A plugin to produce a "well-pruned" tree from a [pegjs](http://pegjs.org) gramma
 
 The idea is to be able to produce a useful object tree using as
 little embedded javascript in the pegjs grammar as possible.
-Maybe this is too much messy syntatic magic, I don't know...
+Maybe this is too much messy syntactic magic, I don't know...
 
 # Transformations:
 
