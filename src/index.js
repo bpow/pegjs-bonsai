@@ -26,6 +26,12 @@ exports.pass = function(ast, options) {
                 code += 'val["' + label + '"] = ' + label + ';';
                 return code;
             }))
+            .concat(function () {
+                if (myOptions.exposeTextAs) {
+                  return '  val["' + myOptions.exposeTextAs + '"] = text();';
+                }
+                return '';
+            }())
             .concat('  return val;')
             .join('\n');
     }
