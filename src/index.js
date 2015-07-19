@@ -16,16 +16,19 @@ exports.pass = function(ast, options) {
         return arr;
     }
 
-    function generate_code_without_undefined(labels) {
+    function generate_code(labels) {
         return ['\n  var val = {};']
             .concat(labels.map(function(label) {
-                return '  if (' + label + ' !== undefined && ' + label + ' !== null) val["' + label + '"] = ' + label + ';';
+                var code = '  ';
+                if (!myOptions.keepUndefined) {
+                    code += 'if (' + label + ' !== undefined && ' + label + ' !== null) ';
+                }
+                code += 'val["' + label + '"] = ' + label + ';';
+                return code;
             }))
             .concat('  return val;')
             .join('\n');
     }
-
-    var generate_code = generate_code_without_undefined;
 
     function process_expression(exp, stack) {
         var stack_plus = stack.concat(exp);
@@ -69,13 +72,6 @@ exports.pass = function(ast, options) {
 
     // Here is the actual body of the 'pass' function:
     myOptions = options.bonsaiPlugin ? options.bonsaiPlugin : {};
-    if (myOptions.keepUndefined) {
-        generate_code = function(labels) {
-            return 'return {' + 
-                labels.map(function(l) { return '"' + l + '":' + l; }).join(',') +
-                    ' };';
-        };
-    }
     ast.rules = ast.rules.map(process_rule);
     if (myOptions.showTransformed) {
         console.log(JSON.stringify(ast.rules, null, 2));
