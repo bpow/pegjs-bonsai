@@ -60,3 +60,5 @@ Some configuration is available, passed to PEG.buildParser in the
 
 * `keepUndefined` if `true`, does not eliminate key-value pairs where
    the value is `null` or `undefined`.
+
+* `exposeTextAs` if set to a string `s`, adds a key-value pair (`s`, `text()`), where [`text()` is the entire string that was matched](https://github.com/pegjs/pegjs/tree/v0.8.0#expression--action-)
